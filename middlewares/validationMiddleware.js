@@ -1,8 +1,9 @@
 const Joi = require("joi");
+const { ValidationError } = require("../helpers/errors");
 
 const validateAddContactFields = (req, res, next) => {
-  const { name, email, phone, favorite } = req.body;
-  if (!name || !email || !phone || ((favorite ?? true) && !favorite)) {
+  const { name, email, phone } = req.body;
+  if (!name || !email || !phone) {
     return res.status(400).json({ message: "missing required field" });
   }
 
@@ -13,15 +14,12 @@ const validateAddContactFields = (req, res, next) => {
       .pattern(/^[0-9-]+$/)
       .min(7)
       .required(),
-    favorite: Joi.boolean().required(),
   });
 
   const { error } = schema.validate(req.body);
 
   if (error) {
-    return res.status(400).json({
-      error: error.details[0].message,
-    });
+    next(new ValidationError(error.details[0].message));
   }
 
   next();
@@ -43,9 +41,23 @@ const validateUpdateContactFields = (req, res, next) => {
 
   const { error } = schema.validate(req.body);
   if (error) {
-    return res.status(400).json({
-      error: error.details[0].message,
-    });
+    next(new ValidationError(error.details[0].message));
+  }
+
+  next();
+};
+const validateUpdateContactStatus = (req, res, next) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "missing fields" });
+  }
+
+  const schema = Joi.object({
+    favorite: Joi.boolean().required(),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    next(new ValidationError(error.details[0].message));
   }
 
   next();
@@ -54,4 +66,5 @@ const validateUpdateContactFields = (req, res, next) => {
 module.exports = {
   validateAddContactFields,
   validateUpdateContactFields,
+  validateUpdateContactStatus,
 };
