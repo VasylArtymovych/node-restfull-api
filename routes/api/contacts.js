@@ -6,16 +6,19 @@ const {
   deleteContactController,
   updateContactController,
   updateContactStatusController,
-} = require("../controllers/contactsController");
+} = require("../../controllers");
 const {
   validateAddContactFields,
   validateUpdateContactFields,
   validateUpdateContactStatus,
-} = require("../../middlewares/validationMiddleware");
+  authMiddleware,
+} = require("../../middlewares");
 
-const { controllerWraper } = require("../../helpers/apiHelpers");
+const { controllerWraper } = require("../../helpers");
 
 const router = express.Router();
+
+router.use(authMiddleware);
 
 router.get("/", controllerWraper(getContactsController));
 
@@ -36,9 +39,9 @@ router.put(
 );
 
 router.patch(
-  "/:contactId",
+  "/:contactId/favorite",
   validateUpdateContactStatus,
   controllerWraper(updateContactStatusController)
 );
 
-module.exports = router;
+module.exports = { contactsRouter: router };
