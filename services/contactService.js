@@ -1,51 +1,62 @@
-const { Contact } = require("../db/contactModel");
-const { WrongParametersError } = require("../helpers/errors");
+const { Contact } = require("../db");
+const { WrongParametersError } = require("../helpers");
 
-const getContacts = async () => {
-  const contacts = await Contact.find();
+const getContacts = async (owner) => {
+  const contacts = await Contact.find({ owner });
   return contacts;
 };
 
-const getContactById = async (id) => {
-  const contact = await Contact.findById(id);
+const getContactById = async (contactId, owner) => {
+  const contact = await Contact.findOne({ _id: contactId, owner });
   if (!contact) {
     throw new WrongParametersError(
-      `Failure, contact with id: ${id} was not found`
+      `Failure, contact with id: ${contactId} was not found`
     );
   }
   return contact;
 };
 
-const addContact = async (body) => {
-  const contact = new Contact(body);
+const addContact = async ({ name, email, phone, favorite }, owner) => {
+  // Contact.create({req.body})  - other option
+  const contact = new Contact({ name, email, phone, favorite, owner });
   await contact.save();
 };
 
-const deleteContact = async (id) => {
-  const contact = await Contact.findByIdAndRemove(id);
+const deleteContact = async (contactId, owner) => {
+  const contact = await Contact.findOneAndRemove({ _id: contactId, owner });
   if (!contact) {
     throw new WrongParametersError(
-      `Failure, contact with id: ${id} was not found`
+      `Failure, contact with id: ${contactId} was not found`
     );
   }
   return contact;
 };
 
-const updateContact = async (id, body) => {
-  const contact = await Contact.findByIdAndUpdate(id, body, {
-    returnDocument: "after",
-  });
+const updateContact = async (
+  contactId,
+  { name, email, phone, favorite },
+  owner
+) => {
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
+    { name, email, phone, favorite },
+    {
+      returnDocument: "after",
+    }
+  );
+
   if (!contact) {
     throw new WrongParametersError(
-      `Failure, contact with id: ${id} was not found`
+      `Failure, contact with id: ${contactId} was not found`
     );
   }
+
   return contact;
 };
 
-const updateStatus = async (id, favorite) => {
-  const contact = await Contact.findByIdAndUpdate(
-    id,
+const updateStatus = async (contactId, favorite, owner) => {
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, owner },
     { favorite },
     {
       returnDocument: "after",
@@ -53,7 +64,7 @@ const updateStatus = async (id, favorite) => {
   );
   if (!contact) {
     throw new WrongParametersError(
-      `Failure, contact with id: ${id} was not found`
+      `Failure, contact with id: ${contactId} was not found`
     );
   }
   return contact;

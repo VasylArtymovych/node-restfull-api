@@ -46,6 +46,7 @@ const validateUpdateContactFields = (req, res, next) => {
 
   next();
 };
+
 const validateUpdateContactStatus = (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({ message: "missing fields" });
@@ -63,8 +64,27 @@ const validateUpdateContactStatus = (req, res, next) => {
   next();
 };
 
+const validateUserFields = (req, res, next) => {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "missing fields" });
+  }
+
+  const schema = Joi.object({
+    password: Joi.string().alphanum().min(3).max(40),
+    email: Joi.string().email(),
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    next(new ValidationError(error.details[0].message));
+  }
+
+  next();
+};
+
 module.exports = {
   validateAddContactFields,
   validateUpdateContactFields,
   validateUpdateContactStatus,
+  validateUserFields,
 };
