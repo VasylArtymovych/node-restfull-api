@@ -7,12 +7,8 @@ const {
   updateContactController,
   updateContactStatusController,
 } = require("../../controllers");
-const {
-  validateAddContactFields,
-  validateUpdateContactFields,
-  validateUpdateContactStatus,
-  authMiddleware,
-} = require("../../middlewares");
+const { authMiddleware, validateMiddleware } = require("../../middlewares");
+const { contactSchema, statusSchema } = require("../../schemas");
 
 const { controllerWraper } = require("../../helpers");
 
@@ -26,7 +22,7 @@ router.get("/:contactId", controllerWraper(getByIdController));
 
 router.post(
   "/",
-  validateAddContactFields,
+  validateMiddleware(contactSchema),
   controllerWraper(addContactController)
 );
 
@@ -34,13 +30,13 @@ router.delete("/:contactId", controllerWraper(deleteContactController));
 
 router.put(
   "/:contactId",
-  validateUpdateContactFields,
+  validateMiddleware(contactSchema),
   controllerWraper(updateContactController)
 );
 
 router.patch(
   "/:contactId/favorite",
-  validateUpdateContactStatus,
+  validateMiddleware(statusSchema),
   controllerWraper(updateContactStatusController)
 );
 

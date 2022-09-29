@@ -24,9 +24,9 @@ const getByIdController = async (req, res) => {
 
 const addContactController = async (req, res) => {
   const { id: owner } = req.user;
-  await addContact(req.body, owner);
+  const contact = await addContact(req.body, owner);
 
-  res.status(200).json({ status: "success" });
+  res.status(200).json({ status: "success", contact });
 };
 
 const deleteContactController = async (req, res) => {
