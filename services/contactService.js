@@ -17,9 +17,8 @@ const getContactById = async (contactId, owner) => {
 };
 
 const addContact = async ({ name, email, phone, favorite }, owner) => {
-  // Contact.create({req.body})  - other option
-  const contact = new Contact({ name, email, phone, favorite, owner });
-  await contact.save();
+  const contact = await Contact.create({ name, email, phone, favorite, owner });
+  return contact;
 };
 
 const deleteContact = async (contactId, owner) => {

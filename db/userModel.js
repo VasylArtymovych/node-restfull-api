@@ -11,6 +11,10 @@ const userShema = new mongoose.Schema({
     required: [true, "Email is required"],
     unique: true,
   },
+  confirmed: {
+    type: Boolean,
+    default: false,
+  },
   subscription: {
     type: String,
     enum: ["starter", "pro", "business"],
@@ -20,11 +24,11 @@ const userShema = new mongoose.Schema({
 });
 
 userShema.pre("save", async function () {
-  if (this.isNew) {
+  if (this.isNew || this.isModified) {
     this.password = await bcrypt.hash(this.password, 10);
   }
-  // todo: if user change pass;
 });
+
 const User = mongoose.model("User", userShema);
 
 module.exports = { User };
