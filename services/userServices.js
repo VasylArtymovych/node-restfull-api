@@ -29,7 +29,7 @@ const registration = async (password, email, subscription) => {
 // confirmation of registration
 const registrationConfirmation = async (code) => {
   const verification = await Verification.findOne({ code, active: true });
-
+console.log(verification.userId);
   if (!verification) {
     throw new NotAuthorizedError("Invalid or expired confirmation code");
   }
@@ -38,6 +38,7 @@ const registrationConfirmation = async (code) => {
     { _id: verification.userId },
     { $set: { confirmed: true } }
   );
+  
   if (!user) {
     throw new NotAuthorizedError("No user found");
   }

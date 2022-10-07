@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.min.js"
+      integrity="sha512-xzC4RSo+4m1clLhr0pQr6yFjO9bJ0py6+l65SBibI8/pSEU8U4iVZ7xm95WRq8PXw2MKv8SSR3QkqR2jciG5Ug=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script type="text/javascript">
+      window.addEventListener("load", () => {
+        const socket = io();
+        const username = prompt("what ypur name?", "Anonym");
+        const form = document.getElementById("form");
+        const input = document.getElementById("input");
+        const messages = document.getElementById("messages");
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (input.value) {
+            socket.emit("CHAT_MESSAGE", { message: input.value, username });
+            input.value = "";
+          }
+        });
+
+        socket.on("CHAT_UPDATE", ({ message }) => {
+          const item = document.createElement("li");
+          item.innerHTML = message;
+          messages.append(item);
+
+          window.scrollTo(0, document.body.scrollHeight);
+        });
+      });
+    </script>
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #form {
+        width: 100%;
+        display: flex;
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.25rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+      }
+      #input {
+        flex-grow: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form" autocomplete="off">
+      <input type="text" id="input" />
+      <button>Send</button>
+    </form>
+  </body>
+</html>
